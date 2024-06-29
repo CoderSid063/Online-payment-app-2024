@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
-const { connectDB } = require("../database");
-
-connectDB();
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
   {
@@ -34,6 +32,18 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// encrypt the password before save
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// check for correct password
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 

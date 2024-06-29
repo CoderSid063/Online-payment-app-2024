@@ -60,8 +60,9 @@ router.post("/signup", async (req, res) => {
 });
 
 //route for sign-in
-router.post("signin", async (req, res) => {
+router.post("/signin", async (req, res) => {
   const body = req.body;
+  const { password } = req.body;
   const { success } = signinSchema.safeparse(req.body);
 
   if (!success) {
@@ -72,8 +73,21 @@ router.post("signin", async (req, res) => {
 
   const user = await User.findOne({
     username: body.username,
-    password: body.password,
   });
+
+  if (!user) {
+    res.status(402).json({
+      message: "user not exist",
+    });
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    return res.status(401).json({
+      message: "password not valid",
+    });
+  }
 
   if (user) {
     const token = jwt.sign(
