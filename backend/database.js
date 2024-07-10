@@ -5,7 +5,7 @@ const connectDB = async () => {
     const connectionInstance = await mongoose.connect(
       "mongodb://localhost:27017/paytm"
     );
-    console.log("\n MongoDb Connected .");
+    console.log(`\n MongoDb Connected : ${connectionInstance.connection.host}`);
   } catch (error) {
     console.log("MongoDb connection error", error);
     process.exit(1);

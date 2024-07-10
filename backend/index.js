@@ -6,19 +6,17 @@ const app = express();
 
 connectDB();
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    method: "GET, POST, PUT, DELETE, PATCH, HEAD",
-    Credential: true,
-  })
-);
+app.use(cors());
+
+app.use(express.static("public"));
 
 app.use(express.json({ limit: "15kb" }));
+
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 const mainRouter = require("./routes/index.js");
 
 app.use("api/v1", mainRouter);
-app.use("api/v1", v2Router);
+// app.use("api/v1", v2Router);
 
 app.listen(3000);

@@ -1,10 +1,11 @@
 const express = require("express");
 const { User } = require("../models/userModel");
 const router = express.Router();
-const zod = requiire("zod");
+const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
 const authMiddleware = require("../middleware");
+const Account = require("../models/accountModel");
 
 //zod validation check:-
 const signupSchema = zod.object({
@@ -53,9 +54,17 @@ router.post("/signup", async (req, res) => {
     lastname: body.lastname,
   });
 
+  const userId = dbUser._id;
+
+  //giving user a rendom balance
+  await Account.create({
+    userId,
+    balance: 1 + Math.random() * 1000,
+  });
+
   const token = jwt.sign(
     {
-      userId: dbUser._id,
+      userId,
     },
     JWT_SECRET
   );
@@ -134,7 +143,7 @@ router.put("/", authMiddleware, async (req, res) => {
   });
 });
 
-//route for get filter name
+//route for get other user name from database
 router.get("/bulk", async (req, res) => {
   const filter = req.query.filter || "";
 
